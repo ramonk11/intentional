@@ -26,5 +26,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   defaultMinutes: 10,
   theme: "dark",
   onboardingDone: false,
-  notificationsEnabled: false
+  notificationsEnabled: false,
+  shortcutReturnEnabled: false,
+  shortcutName: "Intentie Timer"
 };

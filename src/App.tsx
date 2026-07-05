@@ -6,6 +6,7 @@ import { Settings } from "./components/Settings";
 import { StartFlow } from "./components/StartFlow";
 import { TimerScreen } from "./components/TimerScreen";
 import { requestNotificationPermission } from "./lib/notifications";
+import { runReturnShortcut } from "./lib/shortcuts";
 import {
   addSession,
   importData,
@@ -112,6 +113,15 @@ function App() {
     return <Onboarding onDone={finishOnboarding} />;
   }
 
+  const startSession = (session: ActiveSession) => {
+    saveActiveSession(session);
+    setActiveSession(session);
+
+    if (settings.shortcutReturnEnabled) {
+      runReturnShortcut(session, settings.shortcutName);
+    }
+  };
+
   return (
     <div className="app-shell">
       {activeSession ? (
@@ -132,7 +142,7 @@ function App() {
       ) : (
         <>
           {activeTab === "start" && (
-            <StartFlow defaultMinutes={settings.defaultMinutes} onStartSession={setActiveSession} />
+            <StartFlow defaultMinutes={settings.defaultMinutes} onStartSession={startSession} />
           )}
           {activeTab === "logboek" && <Logbook sessions={sessions} />}
           {activeTab === "instellingen" && (

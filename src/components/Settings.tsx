@@ -116,6 +116,41 @@ export function Settings({
         </button>
       </section>
 
+      <section className="settings-group instructions">
+        <h2>Shortcuts-terugkeer</h2>
+        <p>
+          Laat Intentie bij het starten van een sessie een Shortcut openen met de gekozen duur als input. Die Shortcut
+          opent Intentie terug zodra de tijd op is.
+        </p>
+        <label className="toggle-row">
+          <span>Automatisch terug openen</span>
+          <input
+            checked={settings.shortcutReturnEnabled}
+            type="checkbox"
+            onChange={(event) =>
+              onSettingsChange({
+                ...settings,
+                shortcutReturnEnabled: event.target.checked
+              })
+            }
+          />
+        </label>
+        <label className="field-label" htmlFor="shortcut-name">
+          Naam van Shortcut
+        </label>
+        <input
+          id="shortcut-name"
+          className="text-input"
+          value={settings.shortcutName}
+          onChange={(event) =>
+            onSettingsChange({
+              ...settings,
+              shortcutName: event.target.value
+            })
+          }
+        />
+      </section>
+
       <section className="settings-group">
         <h2>Data</h2>
         <div className="button-stack">
@@ -163,8 +198,9 @@ export function Settings({
           een gekozen app opent.
         </p>
         <p>
-          Wil je dat Intentie terugkomt na een vaste tijd? Gebruik in Shortcuts: Open URL met
-          `?autostart=1&amp;seconds=20`, daarna Wacht 20 seconden, daarna Open URL met je gewone app-url.
+          Maak een Shortcut met dezelfde naam als hierboven. Laat die Shortcut de input als dictionary lezen, de waarde
+          `seconds` gebruiken voor Wacht, en daarna `returnUrl` openen. Zo volgt Shortcuts automatisch jouw gekozen
+          tijd.
         </p>
       </section>
     </main>

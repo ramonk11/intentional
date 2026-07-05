@@ -5,6 +5,8 @@ export type AppSettings = {
   theme: ThemeMode;
   onboardingDone: boolean;
   notificationsEnabled: boolean;
+  shortcutReturnEnabled: boolean;
+  shortcutName: string;
 };
 
 export type SessionRecord = {

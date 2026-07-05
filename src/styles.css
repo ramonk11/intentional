@@ -535,6 +535,22 @@ button:disabled {
   color: var(--muted);
 }
 
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 48px;
+  color: var(--text);
+  font-weight: 680;
+}
+
+.toggle-row input {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--accent);
+}
+
 .segmented-control {
   display: grid;
   grid-template-columns: 1fr 1fr;

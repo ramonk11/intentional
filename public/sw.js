@@ -1,4 +1,4 @@
-const CACHE_NAME = "intentie-v2";
+const CACHE_NAME = "intentie-v3";
 const APP_SHELL = [
   "./",
   "./index.html",
