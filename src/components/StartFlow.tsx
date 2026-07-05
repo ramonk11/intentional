@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
-import { DURATION_OPTIONS, INTENT_OPTIONS, REASON_OPTIONS } from "../lib/constants";
+import { DURATION_OPTIONS, INTENT_OPTIONS } from "../lib/constants";
 import type { ActiveSession, IntentDraft } from "../types";
 
-type FlowStep = "intent" | "reason" | "duration" | "confirm";
+type FlowStep = "intent" | "duration";
 
 type StartFlowProps = {
   defaultMinutes: number;
@@ -11,7 +11,7 @@ type StartFlowProps = {
 
 const emptyDraft = (defaultMinutes: number): IntentDraft => ({
   intent: "",
-  reason: "",
+  reason: "Niet gevraagd",
   minutes: defaultMinutes
 });
 
@@ -23,7 +23,6 @@ export function StartFlow({ defaultMinutes, onStartSession }: StartFlowProps) {
 
   const canContinue = useMemo(() => {
     if (step === "intent") return Boolean(draft.intent.trim() || customIntent.trim());
-    if (step === "reason") return Boolean(draft.reason.trim());
     if (step === "duration") return draft.minutes > 0;
     return true;
   }, [customIntent, draft, step]);
@@ -37,7 +36,7 @@ export function StartFlow({ defaultMinutes, onStartSession }: StartFlowProps) {
     const intent = customIntent.trim() || draft.intent;
     if (!intent) return;
     setDraft((current) => ({ ...current, intent }));
-    setStep("reason");
+    setStep("duration");
   };
 
   const chooseDuration = (minutes: number) => {
@@ -62,12 +61,15 @@ export function StartFlow({ defaultMinutes, onStartSession }: StartFlowProps) {
 
   const startSession = () => {
     const startedAt = Date.now();
+    const intent = customIntent.trim() || draft.intent;
+    if (!intent || draft.minutes <= 0) return;
+
     onStartSession({
       id: crypto.randomUUID(),
       startedAt,
       endsAt: startedAt + draft.minutes * 60_000,
       originalMinutes: draft.minutes,
-      intent: draft.intent,
+      intent,
       reason: draft.reason,
       extensions: 0
     });
@@ -75,11 +77,11 @@ export function StartFlow({ defaultMinutes, onStartSession }: StartFlowProps) {
   };
 
   return (
-    <main className="screen">
+    <main className="screen start-screen">
       <FlowProgress step={step} />
 
       {step === "intent" && (
-        <section className="flow-section">
+        <section className="flow-section compact-flow">
           <Header title="Wat wil je doen?" subtitle="Kies bewust voordat je verdergaat." />
           <div className="option-grid">
             {INTENT_OPTIONS.map((option) => (
@@ -106,37 +108,16 @@ export function StartFlow({ defaultMinutes, onStartSession }: StartFlowProps) {
               setDraft((current) => ({ ...current, intent: "" }));
             }}
           />
-          <button className="primary-button" disabled={!canContinue} type="button" onClick={continueFromIntent}>
-            Verder
-          </button>
-        </section>
-      )}
-
-      {step === "reason" && (
-        <section className="flow-section">
-          <Header title="Waarom pak je je telefoon?" subtitle="Een korte check is genoeg." />
-          <div className="option-grid">
-            {REASON_OPTIONS.map((option) => (
-              <button
-                className={draft.reason === option ? "choice-card is-selected" : "choice-card"}
-                key={option}
-                type="button"
-                onClick={() => setDraft((current) => ({ ...current, reason: option }))}
-              >
-                {option}
-              </button>
-            ))}
+          <div className="sticky-action">
+            <button className="primary-button" disabled={!canContinue} type="button" onClick={continueFromIntent}>
+              Verder
+            </button>
           </div>
-          <FlowActions
-            onBack={() => setStep("intent")}
-            onNext={() => setStep("duration")}
-            nextDisabled={!canContinue}
-          />
         </section>
       )}
 
       {step === "duration" && (
-        <section className="flow-section">
+        <section className="flow-section compact-flow">
           <Header title="Voor hoe lang?" subtitle="Kies een limiet die bij deze taak past." />
           <div className="duration-grid">
             {DURATION_OPTIONS.map((minutes) => (
@@ -164,27 +145,11 @@ export function StartFlow({ defaultMinutes, onStartSession }: StartFlowProps) {
             onChange={(event) => applyCustomMinutes(event.target.value)}
           />
           <FlowActions
-            onBack={() => setStep("reason")}
-            onNext={() => setStep("confirm")}
+            onBack={() => setStep("intent")}
+            onNext={startSession}
             nextDisabled={!canContinue}
+            nextLabel="Start"
           />
-        </section>
-      )}
-
-      {step === "confirm" && (
-        <section className="flow-section">
-          <Header title="Check je intentie" subtitle="Als dit klopt, kun je door." />
-          <div className="summary-panel">
-            <SummaryRow label="Intentie" value={draft.intent} />
-            <SummaryRow label="Reden" value={draft.reason} />
-            <SummaryRow label="Tijdsduur" value={`${draft.minutes} min`} />
-          </div>
-          <button className="primary-button" type="button" onClick={startSession}>
-            Start bewust gebruik
-          </button>
-          <button className="quiet-button" type="button" onClick={reset}>
-            Annuleer
-          </button>
         </section>
       )}
     </main>
@@ -201,7 +166,7 @@ function Header({ title, subtitle }: { title: string; subtitle: string }) {
 }
 
 function FlowProgress({ step }: { step: FlowStep }) {
-  const steps: FlowStep[] = ["intent", "reason", "duration", "confirm"];
+  const steps: FlowStep[] = ["intent", "duration"];
   const activeIndex = steps.indexOf(step);
 
   return (
@@ -216,29 +181,22 @@ function FlowProgress({ step }: { step: FlowStep }) {
 function FlowActions({
   onBack,
   onNext,
-  nextDisabled
+  nextDisabled,
+  nextLabel = "Verder"
 }: {
   onBack: () => void;
   onNext: () => void;
   nextDisabled: boolean;
+  nextLabel?: string;
 }) {
   return (
-    <div className="flow-actions">
+    <div className="flow-actions sticky-action">
       <button className="secondary-button" type="button" onClick={onBack}>
         Terug
       </button>
       <button className="primary-button" disabled={nextDisabled} type="button" onClick={onNext}>
-        Verder
+        {nextLabel}
       </button>
-    </div>
-  );
-}
-
-function SummaryRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="summary-row">
-      <span>{label}</span>
-      <strong>{value}</strong>
     </div>
   );
 }

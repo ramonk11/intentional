@@ -1,6 +1,6 @@
 # Intentie
 
-Intentie is een mobile-first PWA die je kort laat kiezen wat je wilt doen, waarom je je apparaat pakt en hoe lang je ermee bezig wilt zijn. De app werkt zonder backend en bewaart alles lokaal in `localStorage`.
+Intentie is een mobile-first PWA die je kort laat kiezen wat je wilt doen en hoe lang je ermee bezig wilt zijn. De app werkt zonder backend en bewaart alles lokaal in `localStorage`.
 
 ## Lokaal draaien
 
@@ -61,6 +61,14 @@ De productieversie komt in `dist/`.
 ## Data
 
 Sessies en instellingen blijven op het apparaat in `localStorage`. In de instellingen kun je data exporteren als JSON, importeren of resetten.
+
+## Timer en notificaties
+
+Je kunt in de instellingen notificaties aanzetten. Wanneer de timer afloopt, probeert de app een melding te sturen. Tik op de melding om Intentie weer te openen.
+
+Een PWA kan zichzelf niet automatisch naar voren halen na 10 minuten. iOS bepaalt ook wanneer webapps op de achtergrond gepauzeerd worden. Daarom bewaart Intentie de lopende sessie lokaal en rekent de timer met `Date.now()`: als de app opnieuw geopend wordt, staat de juiste resterende of verlopen tijd klaar.
+
+Als je iOS Shortcuts gebruikt voor meerdere afleidende apps, blijft iOS die automation starten wanneer je zo'n app opent. Intentie kan dat niet blokkeren voordat iOS de PWA opent. Wel onthoudt de app de actieve sessie, zodat je niet opnieuw door de intentieflow hoeft.
 
 ## PWA
 

@@ -5,19 +5,33 @@ import { Onboarding } from "./components/Onboarding";
 import { Settings } from "./components/Settings";
 import { StartFlow } from "./components/StartFlow";
 import { TimerScreen } from "./components/TimerScreen";
-import { addSession, importData, loadSessions, loadSettings, resetAllData, saveSettings } from "./lib/storage";
+import { requestNotificationPermission } from "./lib/notifications";
+import {
+  addSession,
+  importData,
+  loadActiveSession,
+  loadSessions,
+  loadSettings,
+  resetAllData,
+  saveActiveSession,
+  saveSettings
+} from "./lib/storage";
 import type { ActiveSession, AppSettings, SessionRecord } from "./types";
 
 function App() {
   const [settings, setSettings] = useState<AppSettings>(() => loadSettings());
   const [sessions, setSessions] = useState<SessionRecord[]>(() => loadSessions());
   const [activeTab, setActiveTab] = useState<TabId>("start");
-  const [activeSession, setActiveSession] = useState<ActiveSession | null>(null);
+  const [activeSession, setActiveSession] = useState<ActiveSession | null>(() => loadActiveSession());
 
   useEffect(() => {
     document.documentElement.dataset.theme = settings.theme;
     saveSettings(settings);
   }, [settings]);
+
+  useEffect(() => {
+    saveActiveSession(activeSession);
+  }, [activeSession]);
 
   const finishOnboarding = () => {
     setSettings((current) => ({ ...current, onboardingDone: true }));
@@ -49,6 +63,14 @@ function App() {
     setActiveTab("start");
   };
 
+  const enableNotifications = async () => {
+    const permission = await requestNotificationPermission();
+    setSettings((current) => ({
+      ...current,
+      notificationsEnabled: permission === "granted"
+    }));
+  };
+
   const importJson = async (file: File) => {
     try {
       const data = JSON.parse(await file.text());
@@ -69,8 +91,12 @@ function App() {
       {activeSession ? (
         <TimerScreen
           session={activeSession}
+          notificationsEnabled={settings.notificationsEnabled}
           onExtend={extendSession}
           onFinish={finishSession}
+          onMarkNotified={() => {
+            setActiveSession((current) => (current ? { ...current, notifiedAt: Date.now() } : current));
+          }}
           onNewIntent={(record) => {
             setSessions(addSession(record));
             setActiveSession(null);
@@ -90,6 +116,7 @@ function App() {
               onSettingsChange={setSettings}
               onReset={resetData}
               onImport={importJson}
+              onEnableNotifications={enableNotifications}
             />
           )}
         </>

@@ -4,6 +4,7 @@ export type AppSettings = {
   defaultMinutes: number;
   theme: ThemeMode;
   onboardingDone: boolean;
+  notificationsEnabled: boolean;
 };
 
 export type SessionRecord = {
@@ -27,6 +28,7 @@ export type ActiveSession = {
   intent: string;
   reason: string;
   extensions: number;
+  notifiedAt?: number;
 };
 
 export type IntentDraft = {

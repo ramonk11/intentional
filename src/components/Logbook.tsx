@@ -9,6 +9,7 @@ export function Logbook({ sessions }: LogbookProps) {
   const today = sessions.filter((session) => isToday(session.startedAt));
   const totalToday = today.reduce((sum, session) => sum + session.actualMinutes, 0);
   const extensions = today.reduce((sum, session) => sum + session.extensions, 0);
+  const reasonSessions = today.filter((session) => session.reason !== "Niet gevraagd");
   const recent = sessions.slice(0, 10);
 
   return (
@@ -22,7 +23,7 @@ export function Logbook({ sessions }: LogbookProps) {
         <StatCard label="Sessies vandaag" value={String(today.length)} />
         <StatCard label="Minuten vandaag" value={minutesLabel(totalToday)} />
         <StatCard label="Meest gekozen intentie" value={mostChosen(today, "intent")} />
-        <StatCard label="Meest gekozen reden" value={mostChosen(today, "reason")} />
+        <StatCard label="Meest gekozen reden" value={reasonSessions.length ? mostChosen(reasonSessions, "reason") : "Niet gevraagd"} />
         <StatCard label="Verlengingen" value={String(extensions)} />
       </section>
 
@@ -37,7 +38,8 @@ export function Logbook({ sessions }: LogbookProps) {
                 <div>
                   <h3>{session.intent}</h3>
                   <p>
-                    {session.reason} - {formatDateTime(session.startedAt)}
+                    {session.reason !== "Niet gevraagd" ? `${session.reason} - ` : ""}
+                    {formatDateTime(session.startedAt)}
                   </p>
                 </div>
                 <div className="session-meta">

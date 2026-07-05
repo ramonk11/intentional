@@ -90,6 +90,10 @@ button {
   animation: rise-in 260ms ease both;
 }
 
+.start-screen {
+  padding-bottom: calc(160px + env(safe-area-inset-bottom));
+}
+
 .screen-header {
   margin: 18px 0 28px;
 }
@@ -190,6 +194,24 @@ button {
   gap: 18px;
 }
 
+.compact-flow {
+  gap: 12px;
+}
+
+.compact-flow .screen-header {
+  margin: 4px 0 8px;
+}
+
+.compact-flow .screen-header h1 {
+  max-width: 100%;
+  font-size: clamp(2rem, 10vw, 3.6rem);
+}
+
+.compact-flow .screen-header p {
+  margin-top: 8px;
+  font-size: 0.96rem;
+}
+
 .progress-dots {
   display: flex;
   gap: 8px;
@@ -220,7 +242,7 @@ button {
 }
 
 .option-grid {
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .duration-grid,
@@ -229,15 +251,39 @@ button {
 }
 
 .choice-card {
-  min-height: 68px;
-  padding: 18px;
+  min-height: 58px;
+  padding: 12px 13px;
   color: var(--text);
   background: var(--surface);
+  font-size: 0.94rem;
+  line-height: 1.2;
   text-align: left;
   transition:
     transform 170ms ease,
     border-color 170ms ease,
     background 170ms ease;
+}
+
+.text-input {
+  scroll-margin-bottom: 180px;
+}
+
+@media (max-width: 380px) {
+  .screen {
+    padding-right: 14px;
+    padding-left: 14px;
+  }
+
+  .option-grid,
+  .duration-grid {
+    gap: 8px;
+  }
+
+  .choice-card {
+    min-height: 54px;
+    padding: 10px 11px;
+    font-size: 0.88rem;
+  }
 }
 
 .choice-card:active,
@@ -324,6 +370,15 @@ button:disabled {
 .button-stack {
   display: grid;
   gap: 10px;
+}
+
+.sticky-action {
+  position: sticky;
+  bottom: calc(92px + env(safe-area-inset-bottom));
+  z-index: 8;
+  margin-top: 2px;
+  padding: 8px 0 0;
+  background: linear-gradient(180deg, transparent, var(--bg) 28%);
 }
 
 .summary-panel {
@@ -559,10 +614,6 @@ button:disabled {
   .screen {
     padding-right: 28px;
     padding-left: 28px;
-  }
-
-  .option-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .duration-grid {

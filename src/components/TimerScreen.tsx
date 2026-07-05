@@ -1,18 +1,42 @@
+import { useEffect, useRef } from "react";
 import { useTicker } from "../hooks/useTicker";
+import { showTimerFinishedNotification } from "../lib/notifications";
 import type { ActiveSession, SessionRecord } from "../types";
 
 type TimerScreenProps = {
   session: ActiveSession;
+  notificationsEnabled: boolean;
   onExtend: () => void;
   onFinish: (record: SessionRecord) => void;
+  onMarkNotified: () => void;
   onNewIntent: (record: SessionRecord) => void;
 };
 
-export function TimerScreen({ session, onExtend, onFinish, onNewIntent }: TimerScreenProps) {
+export function TimerScreen({
+  session,
+  notificationsEnabled,
+  onExtend,
+  onFinish,
+  onMarkNotified,
+  onNewIntent
+}: TimerScreenProps) {
+  const notifiedRef = useRef<string | null>(session.notifiedAt ? session.id : null);
   const now = useTicker();
   const remainingMs = Math.max(0, session.endsAt - now);
   const isExpired = remainingMs <= 0;
   const progress = Math.min(1, (now - session.startedAt) / Math.max(1, session.endsAt - session.startedAt));
+
+  useEffect(() => {
+    if (!isExpired || session.notifiedAt || notifiedRef.current === session.id) return;
+
+    notifiedRef.current = session.id;
+    onMarkNotified();
+    if (notificationsEnabled) {
+      showTimerFinishedNotification(session.intent).catch(() => {
+        // Notificaties zijn best-effort; de timer zelf blijft de bron van waarheid.
+      });
+    }
+  }, [isExpired, notificationsEnabled, onMarkNotified, session.intent, session.notifiedAt]);
 
   const createRecord = (completed: boolean): SessionRecord => {
     const endedAt = Date.now();

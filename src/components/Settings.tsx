@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { createExportData } from "../lib/storage";
+import { getNotificationStatus } from "../lib/notifications";
 import type { AppSettings, SessionRecord, ThemeMode } from "../types";
 
 type SettingsProps = {
@@ -8,10 +9,20 @@ type SettingsProps = {
   onSettingsChange: (settings: AppSettings) => void;
   onReset: () => void;
   onImport: (file: File) => void;
+  onEnableNotifications: () => void;
 };
 
-export function Settings({ settings, sessions, onSettingsChange, onReset, onImport }: SettingsProps) {
+export function Settings({
+  settings,
+  sessions,
+  onSettingsChange,
+  onReset,
+  onImport,
+  onEnableNotifications
+}: SettingsProps) {
   const fileInput = useRef<HTMLInputElement>(null);
+  const notificationStatus = getNotificationStatus();
+  const notificationsActive = notificationStatus === "granted" && settings.notificationsEnabled;
 
   const updateTheme = (theme: ThemeMode) => {
     onSettingsChange({ ...settings, theme });
@@ -78,6 +89,33 @@ export function Settings({ settings, sessions, onSettingsChange, onReset, onImpo
         </div>
       </section>
 
+      <section className="settings-group instructions">
+        <h2>Timer-notificatie</h2>
+        <p>
+          Stuur een melding wanneer de timer voorbij is. Tik op de melding om Intentie weer te openen.
+        </p>
+        <button
+          className="secondary-button"
+          disabled={notificationStatus === "unsupported" || notificationStatus === "denied"}
+          type="button"
+          onClick={() => {
+            if (notificationsActive) {
+              onSettingsChange({ ...settings, notificationsEnabled: false });
+              return;
+            }
+            onEnableNotifications();
+          }}
+        >
+          {notificationsActive
+            ? "Notificaties uitzetten"
+            : notificationStatus === "denied"
+              ? "Geblokkeerd in systeeminstellingen"
+              : notificationStatus === "unsupported"
+                ? "Niet ondersteund"
+                : "Notificaties aanzetten"}
+        </button>
+      </section>
+
       <section className="settings-group">
         <h2>Data</h2>
         <div className="button-stack">
@@ -119,6 +157,10 @@ export function Settings({ settings, sessions, onSettingsChange, onReset, onImpo
         <p>
           Open Opdrachten &gt; Automatisering &gt; App &gt; kies apps &gt; Wordt geopend &gt; Open URL &gt; plak je
           app-url.
+        </p>
+        <p>
+          iOS kan een PWA niet vanzelf na je timer naar voren halen. Een Shortcut kan Intentie wel openen wanneer jij
+          een gekozen app opent.
         </p>
       </section>
     </main>
