@@ -11,8 +11,29 @@ createRoot(document.getElementById("root")!).render(
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`).catch(() => {
-      // De app blijft bruikbaar als registratie niet lukt, bijvoorbeeld in privévensters.
+    let refreshing = false;
+
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (refreshing) return;
+      refreshing = true;
+      window.location.reload();
     });
+
+    navigator.serviceWorker
+      .register(`${import.meta.env.BASE_URL}sw.js`)
+      .then((registration) => {
+        registration.waiting?.postMessage({ type: "SKIP_WAITING" });
+
+        registration.addEventListener("updatefound", () => {
+          registration.installing?.addEventListener("statechange", () => {
+            if (registration.waiting) {
+              registration.waiting.postMessage({ type: "SKIP_WAITING" });
+            }
+          });
+        });
+      })
+      .catch(() => {
+        // De app blijft bruikbaar als registratie niet lukt, bijvoorbeeld in privévensters.
+      });
   });
 }
