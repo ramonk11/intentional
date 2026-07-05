@@ -58,6 +58,22 @@ De productieversie komt in `dist/`.
 7. Plak je Intentie app-url.
 8. Zet vragen voor uitvoeren uit als iOS dat aanbiedt.
 
+### Intentie automatisch terug openen na vaste tijd
+
+Een PWA kan zichzelf niet automatisch openen. iOS Shortcuts kan dat wel doen met een vaste wachttijd:
+
+1. Voeg actie **Open URL** toe met je app-url plus `?autostart=1&seconds=20`.
+2. Voeg actie **Wacht** toe, bijvoorbeeld 20 seconden of 600 seconden.
+3. Voeg actie **Open URL** toe met je gewone app-url.
+
+Voor 10 minuten kun je ook `?autostart=1&minutes=10` gebruiken. De wachttijd in Shortcuts moet dan ook 10 minuten zijn.
+
+Voorbeeld:
+
+```text
+https://jouw-app-url.nl/?autostart=1&seconds=20
+```
+
 ## Data
 
 Sessies en instellingen blijven op het apparaat in `localStorage`. In de instellingen kun je data exporteren als JSON, importeren of resetten.

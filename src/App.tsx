@@ -33,6 +33,32 @@ function App() {
     saveActiveSession(activeSession);
   }, [activeSession]);
 
+  useEffect(() => {
+    if (activeSession) return;
+
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("autostart") !== "1") return;
+
+    const seconds = Number(params.get("seconds"));
+    const minutes = Number(params.get("minutes"));
+    const durationSeconds = Number.isFinite(seconds) && seconds > 0 ? seconds : minutes * 60;
+    if (!Number.isFinite(durationSeconds) || durationSeconds <= 0) return;
+
+    const startedAt = Date.now();
+    setActiveSession({
+      id: crypto.randomUUID(),
+      startedAt,
+      endsAt: startedAt + durationSeconds * 1000,
+      originalMinutes: durationSeconds / 60,
+      originalSeconds: durationSeconds,
+      intent: params.get("intent") || "Bewust gebruik",
+      reason: "Shortcut",
+      extensions: 0
+    });
+
+    window.history.replaceState({}, "", window.location.pathname || "./");
+  }, [activeSession]);
+
   const finishOnboarding = () => {
     setSettings((current) => ({ ...current, onboardingDone: true }));
   };

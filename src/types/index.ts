@@ -14,7 +14,9 @@ export type SessionRecord = {
   intent: string;
   reason: string;
   plannedMinutes: number;
+  plannedSeconds?: number;
   actualMinutes: number;
+  actualSeconds?: number;
   completed: boolean;
   extended: boolean;
   extensions: number;
@@ -25,6 +27,7 @@ export type ActiveSession = {
   startedAt: number;
   endsAt: number;
   originalMinutes: number;
+  originalSeconds: number;
   intent: string;
   reason: string;
   extensions: number;
@@ -35,6 +38,7 @@ export type IntentDraft = {
   intent: string;
   reason: string;
   minutes: number;
+  durationSeconds: number;
 };
 
 export type ExportData = {

@@ -12,7 +12,8 @@ type StartFlowProps = {
 const emptyDraft = (defaultMinutes: number): IntentDraft => ({
   intent: "",
   reason: "Niet gevraagd",
-  minutes: defaultMinutes
+  minutes: defaultMinutes,
+  durationSeconds: defaultMinutes * 60
 });
 
 export function StartFlow({ defaultMinutes, onStartSession }: StartFlowProps) {
@@ -23,7 +24,7 @@ export function StartFlow({ defaultMinutes, onStartSession }: StartFlowProps) {
 
   const canContinue = useMemo(() => {
     if (step === "intent") return Boolean(draft.intent.trim() || customIntent.trim());
-    if (step === "duration") return draft.minutes > 0;
+    if (step === "duration") return draft.durationSeconds > 0;
     return true;
   }, [customIntent, draft, step]);
 
@@ -39,8 +40,8 @@ export function StartFlow({ defaultMinutes, onStartSession }: StartFlowProps) {
     setStep("duration");
   };
 
-  const chooseDuration = (minutes: number) => {
-    setDraft((current) => ({ ...current, minutes }));
+  const chooseDuration = (seconds: number) => {
+    setDraft((current) => ({ ...current, minutes: seconds / 60, durationSeconds: seconds }));
     setCustomMinutes("");
   };
 
@@ -48,7 +49,8 @@ export function StartFlow({ defaultMinutes, onStartSession }: StartFlowProps) {
     setCustomMinutes(value);
     const parsed = Number(value);
     if (Number.isFinite(parsed) && parsed > 0) {
-      setDraft((current) => ({ ...current, minutes: Math.round(parsed) }));
+      const minutes = Math.round(parsed);
+      setDraft((current) => ({ ...current, minutes, durationSeconds: minutes * 60 }));
     }
   };
 
@@ -62,13 +64,14 @@ export function StartFlow({ defaultMinutes, onStartSession }: StartFlowProps) {
   const startSession = () => {
     const startedAt = Date.now();
     const intent = customIntent.trim() || draft.intent;
-    if (!intent || draft.minutes <= 0) return;
+    if (!intent || draft.durationSeconds <= 0) return;
 
     onStartSession({
       id: crypto.randomUUID(),
       startedAt,
-      endsAt: startedAt + draft.minutes * 60_000,
+      endsAt: startedAt + draft.durationSeconds * 1000,
       originalMinutes: draft.minutes,
+      originalSeconds: draft.durationSeconds,
       intent,
       reason: draft.reason,
       extensions: 0
@@ -120,14 +123,14 @@ export function StartFlow({ defaultMinutes, onStartSession }: StartFlowProps) {
         <section className="flow-section compact-flow">
           <Header title="Voor hoe lang?" subtitle="Kies een limiet die bij deze taak past." />
           <div className="duration-grid">
-            {DURATION_OPTIONS.map((minutes) => (
+            {DURATION_OPTIONS.map((duration) => (
               <button
-                className={draft.minutes === minutes ? "choice-card is-selected" : "choice-card"}
-                key={minutes}
+                className={draft.durationSeconds === duration.seconds ? "choice-card is-selected" : "choice-card"}
+                key={duration.label}
                 type="button"
-                onClick={() => chooseDuration(minutes)}
+                onClick={() => chooseDuration(duration.seconds)}
               >
-                {minutes} min
+                {duration.label}
               </button>
             ))}
           </div>

@@ -162,6 +162,10 @@ export function Settings({
           iOS kan een PWA niet vanzelf na je timer naar voren halen. Een Shortcut kan Intentie wel openen wanneer jij
           een gekozen app opent.
         </p>
+        <p>
+          Wil je dat Intentie terugkomt na een vaste tijd? Gebruik in Shortcuts: Open URL met
+          `?autostart=1&amp;seconds=20`, daarna Wacht 20 seconden, daarna Open URL met je gewone app-url.
+        </p>
       </section>
     </main>
   );

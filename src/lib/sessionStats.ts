@@ -31,5 +31,9 @@ export function mostChosen(sessions: SessionRecord[], key: "intent" | "reason") 
 }
 
 export function minutesLabel(minutes: number) {
+  if (minutes > 0 && minutes < 1) {
+    return `${Math.max(1, Math.round(minutes * 60))} sec`;
+  }
+
   return `${Math.round(minutes)} min`;
 }

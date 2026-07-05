@@ -12,7 +12,15 @@ export const INTENT_OPTIONS = [
   "Anders"
 ];
 
-export const DURATION_OPTIONS = [2, 5, 10, 20, 30, 60];
+export const DURATION_OPTIONS = [
+  { label: "20 sec", seconds: 20 },
+  { label: "2 min", seconds: 2 * 60 },
+  { label: "5 min", seconds: 5 * 60 },
+  { label: "10 min", seconds: 10 * 60 },
+  { label: "20 min", seconds: 20 * 60 },
+  { label: "30 min", seconds: 30 * 60 },
+  { label: "60 min", seconds: 60 * 60 }
+];
 
 export const DEFAULT_SETTINGS: AppSettings = {
   defaultMinutes: 10,

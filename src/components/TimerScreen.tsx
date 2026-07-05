@@ -40,14 +40,19 @@ export function TimerScreen({
 
   const createRecord = (completed: boolean): SessionRecord => {
     const endedAt = Date.now();
+    const actualSeconds = Math.max(1, Math.round((endedAt - session.startedAt) / 1000));
+    const plannedSeconds = session.originalSeconds ?? session.originalMinutes * 60;
+
     return {
       id: session.id,
       startedAt: new Date(session.startedAt).toISOString(),
       endedAt: new Date(endedAt).toISOString(),
       intent: session.intent,
       reason: session.reason,
-      plannedMinutes: session.originalMinutes,
-      actualMinutes: Math.max(1, Math.round((endedAt - session.startedAt) / 60_000)),
+      plannedMinutes: plannedSeconds / 60,
+      plannedSeconds,
+      actualMinutes: actualSeconds / 60,
+      actualSeconds,
       completed,
       extended: session.extensions > 0,
       extensions: session.extensions

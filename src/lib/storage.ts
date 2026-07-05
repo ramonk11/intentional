@@ -45,7 +45,10 @@ export function addSession(session: SessionRecord): SessionRecord[] {
 export function loadActiveSession(): ActiveSession | null {
   const session = safeParse<ActiveSession | null>(localStorage.getItem(ACTIVE_SESSION_KEY), null);
   if (!session || typeof session.endsAt !== "number") return null;
-  return session;
+  return {
+    ...session,
+    originalSeconds: session.originalSeconds ?? session.originalMinutes * 60
+  };
 }
 
 export function saveActiveSession(session: ActiveSession | null) {
